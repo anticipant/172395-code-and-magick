@@ -19,6 +19,11 @@ var renderCloud = function (ctx, x, y, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, TABLE_WIDTH, TABLE_HEIGHT);
 };
+var renderText = function (ctx, text, x, y, color) {
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+};
+
 window.renderStatistics = function (ctx, names, times) {
   var getMaxElement = function () {
     var maxElement = times[0];
@@ -38,28 +43,33 @@ window.renderStatistics = function (ctx, names, times) {
   renderCloud(ctx, TABLE_X, TABLE_Y, '#fff');
 
   // Текст
-  ctx.fillStyle = '#000';
   ctx.font = '16px PT Mono';
-  ctx.fillText('Ура вы победили!', TITLE_X, TITLE_Y);
-  ctx.fillText('Список результатов:', TITLE_X, TITLE_Y + TITLE_Y_OFFSET);
-
+  renderText(ctx, 'Ура вы победили!', TITLE_X, TITLE_Y, '#000');
+  renderText(ctx, 'Список результатов:', TITLE_X, TITLE_Y + TITLE_Y_OFFSET, '#000');
 
   var maxTime = getMaxElement(times);
 
   for (var i = 0; i < names.length; i++) {
-
     var playerResult = (BAR_MAX_HEIGHT * Math.round(times[i])) / maxTime;
     var topCoord = TITLE_BOTTOM_MARGIN + (BAR_MAX_HEIGHT - playerResult);
 
-    ctx.fillText(names[i], TABLE_X + GAP + (BAR_WIDTH + BAR_MARGIN) * i, TITLE_BOTTOM_MARGIN + BAR_MAX_HEIGHT + NAME_MARGIN);
+    renderText(ctx, names[i], TABLE_X + GAP + (BAR_WIDTH + BAR_MARGIN) * i, TITLE_BOTTOM_MARGIN + BAR_MAX_HEIGHT + NAME_MARGIN, '#000');
     if (names[i] === 'Вы') {
       ctx.fillStyle = 'rgba(255, 0, 0, 1)';
     } else {
-      ctx.fillStyle = 'rgba(0, 0, 255, ' + Math.random() + ')';
+
+      // рандомный цвет результата для других игроков
+      var randomColor = function () {
+        return Math.random();
+      };
+      var correctRGBColor = randomColor();
+
+      while (correctRGBColor < 0.1) {
+        correctRGBColor = randomColor();
+      }
+      ctx.fillStyle = 'rgba(0, 0, 255, ' + correctRGBColor + ')';
     }
     ctx.fillRect(TABLE_X + GAP + (BAR_WIDTH + BAR_MARGIN) * i, topCoord, BAR_WIDTH, playerResult);
-    ctx.fillStyle = '#000';
-    ctx.fillText(Math.round(times[i]), TABLE_X + GAP + (BAR_WIDTH + BAR_MARGIN) * i, topCoord - RESULT_TEXT_MARGIN);
+    renderText(ctx, Math.round(times[i]), TABLE_X + GAP + (BAR_WIDTH + BAR_MARGIN) * i, topCoord - RESULT_TEXT_MARGIN, '#000');
   }
-
 };
